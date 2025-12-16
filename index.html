@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Eco-Chip</title>
+<style>
+body{margin:0;font-family:"Cairo",sans-serif;background:#f4f7f5;color:#003d1f;text-align:center;}
+header{background:#0a7d3a;color:white;padding:30px 15px 40px;border-radius:0 0 35px 35px;}
+.container{max-width:820px;margin:-25px auto 60px;padding:0 12px;}
+.upload-box{background:white;border:3px dashed #0a7d3a;padding:25px;border-radius:30px;cursor:pointer;margin-bottom:20px;box-shadow:0 6px 20px rgba(0,0,0,.12);}
+.card{background:white;border-radius:35px;padding:25px;box-shadow:0 10px 28px rgba(0,0,0,.15);display:none;text-align:center;}
+.sample-img{max-width:220px;border-radius:22px;margin:0 auto 15px;display:block;}
+.badge{padding:12px 28px;border-radius:25px;font-weight:bold;margin:10px auto;display:inline-block;font-size:1.1em;}
+.recycle{background:#e6ffed;color:#0a7d3a;}
+.dispose{background:#ffe6e6;color:#b00000;}
+.materials{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px;}
+.material{background:#f6f6f6;padding:6px 14px;border-radius:18px;font-size:.9em;}
+.ai-box{margin-top:25px;padding:20px;border-radius:28px;background:#f7fff9;border:2px solid #0a7d3a;text-align:right;}
+</style>
+</head>
+<body>
+<header>
+<h1>Eco-Chip</h1>
+<p>تحليل ذكي للنفايات الإلكترونية</p>
+</header>
+<div class="container">
+<label class="upload-box">
+<input type="file" id="imageInput" accept="image/*" hidden>
+📸 اضغطي لرفع صورة العينة
+</label>
+
+<div class="card" id="card">
+<img id="preview" class="sample-img">
+<h2 id="sampleName"></h2>
+<div id="decision" class="badge"></div>
+
+<h3>المواد الكيميائية</h3>
+<div class="materials" id="materialsBox"></div>
+<div class="ai-box" id="aiText"></div>
+</div>
+</div>
+
+<script>
+const DB = {
+battery:{name:"🔋 بطارية",decision:"❌ إتلاف آمن",materials:["Li — ليثيوم","Co — كوبالت","Ni — نيكل","Al — ألومنيوم"],ai:"تحليل Eco-Chip AI: البطاريات خطرة وتحتاج إتلاف آمن."},
+hdd:{name:"💽 قرص صلب HDD",decision:"♻️ إعادة تدوير",materials:["Al — ألومنيوم","Fe — حديد","Cu — نحاس","Nd — نيوديميوم"],ai:"تحليل Eco-Chip AI: القرص الصلب يحتوي على معادن قابلة لإعادة التدوير."},
+pcb:{name:"🟩 لوحة إلكترونية PCB",decision:"♻️ إعادة تدوير",materials:["Cu — نحاس","Au — ذهب","Ag — فضة","Pb — رصاص"],ai:"تحليل Eco-Chip AI: اللوحات الإلكترونية تحتوي على معادن ثمينة."}
+};
+
+document.getElementById("imageInput").addEventListener("change", e=>{
+    const file = e.target.files[0];
+    if(!file) return;
+    const img=document.getElementById("preview");
+    img.src = URL.createObjectURL(file);
+    document.getElementById("card").style.display="block";
+
+    let type=null;
+    const name = file.name.toLowerCase();
+    if(name.includes("battery") || name.includes("bat")) type="battery";
+    else if(name.includes("hdd") || name.includes("hard")) type="hdd";
+    else if(name.includes("pcb") || name.includes("board")) type="pcb";
+
+    if(type){
+        const d = DB[type];
+        document.getElementById("sampleName").innerText = d.name;
+        const decisionEl = document.getElementById("decision");
+        decisionEl.innerText = d.decision;
+        decisionEl.className = "badge " + (type==="battery"?"dispose":"recycle");
+        const box=document.getElementById("materialsBox");
+        box.innerHTML="";
+        d.materials.forEach(m=>box.innerHTML+=`<div class="material">${m}</div>`);
+        document.getElementById("aiText").innerText=d.ai;
+    }else{
+        document.getElementById("sampleName").innerText="❓ عينة غير معروفة";
+        const decisionEl = document.getElementById("decision");
+        decisionEl.innerText="لا يمكن تحديد الإجراء";
+        decisionEl.className="badge dispose";
+        document.getElementById("materialsBox").innerHTML="<div class='material'>لا توجد معلومات</div>";
+        document.getElementById("aiText").innerText="تحليل Eco-Chip AI: لا يمكن التعرف على نوع العينة.";
+    }
+});
+</script>
+</body>
+</html>
+
+
+
+
+
+
+
+
